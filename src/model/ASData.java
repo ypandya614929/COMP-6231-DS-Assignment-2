@@ -1,6 +1,12 @@
 package model;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -158,12 +164,12 @@ public class ASData {
 				HashMap<String, Player> playerData = playerserverData.get(UsernameToSuspendKey);
 				if (playerData.containsKey(UsernameToSuspend)) {
 					playerData.remove(UsernameToSuspend);
-					logger.info("IP : " + AdminIP + ", username : " + AdminUsername + ", Result suspendAccount() : Player account ("+ UsernameToSuspend +") is suspended.");
-					return "Player account ("+ UsernameToSuspend +") is suspended.";
+					logger.info("IP : " + AdminIP + ", username : " + AdminUsername + ", Result suspendAccount() : Player account ("+ UsernameToSuspend +") is suspended");
+					return "Player account ("+ UsernameToSuspend +") is suspended";
 				}
 			}
-			logger.info("IP : " + AdminIP + ", username : " + AdminUsername + ", Result suspendAccount() : Player account ("+ UsernameToSuspend +") is not found.");
-			return "Player account ("+ UsernameToSuspend +") is not found.";
+			logger.info("IP : " + AdminIP + ", username : " + AdminUsername + ", Result suspendAccount() : Player account ("+ UsernameToSuspend +") doesn't exists");
+			return "Player account ("+ UsernameToSuspend +") doesn't exists";
 		}
 		logger.info("IP : " + AdminIP + ", username : " + AdminUsername + ", Result suspendAccount() : invalid username or password");
 		return "Invalid username or password";
@@ -270,6 +276,100 @@ public class ASData {
 		}
 		logger.info("IP : " + ipAddress + ", username : " + userName + ", Result playerSignOut() : Player doesn't exists");
 		return "Player doesn't exists";
+	}
+	
+	/**
+	 * This synchronized method is used to transfer the player account
+	 * @param Username username of the player
+	 * @param Password password of the player
+	 * @param OldIPAddress old ip of the player
+	 * @param NewIPAddress new ip of the player
+	 * @return
+	 */
+	synchronized public String transferAccount(String Username, String Password, String OldIPAddress, String NewIPAddress) {
+		logger.info("IP : " + OldIPAddress + ", username : " + Username + ", start transferAccount() operation.");
+		Player playerObj;
+		String key = Character.toString(Username.charAt(0));
+		if (playerserverData.containsKey(key)) {
+			HashMap<String,Player> playerData = playerserverData.get(key);
+			if (playerData.containsKey(Username)) {
+				playerObj = playerData.get(Username);
+				synchronized(playerObj) {
+					if (playerObj.userName.equals(Username) && playerObj.ipAddress.equals(OldIPAddress) && playerObj.password.equals(Password)) {
+						int port = getServerPort(NewIPAddress);
+						String data = transferAccountToOtherServer(playerObj.getUserName(), playerObj.getPassword(), playerObj.age, NewIPAddress, playerObj.getFirstName(), playerObj.getLastName(),port, "transferAccount");
+						if (data.trim().equals("Player created successfully")) {
+							playerData.remove(Username);
+							logger.info("IP : " + OldIPAddress + ", username : " + Username + ", Result transferAccount() : Player account is transfered from " + OldIPAddress + " to " + NewIPAddress);
+							return "Player account is transfered from " + OldIPAddress + " to " + NewIPAddress;
+						} else {
+							logger.info("IP : " + OldIPAddress + ", username : " + Username + ", Result transferAccount() : Player account is not transfered");
+							return "Player account is not transfered";
+						}
+					}
+					logger.info("IP : " + OldIPAddress + ", username : " + Username + ", Result transferAccount() : Invalid IP address or Password");
+					return "Invalid IP address or Password";
+				}
+			}
+		}
+		logger.info("IP : " + OldIPAddress + ", username : " + Username + ", Result transferAccount() : Player doesn't exists");
+		return "Player doesn't exists";
+	}
+	
+	/**
+	 * This method used to communicate with server to transfer player
+	 * @param username username of the player
+	 * @param password password of the player
+	 * @param age age of the player
+	 * @param ip new ip of the player
+	 * @param port server port number 
+	 * @param fun type of method
+	 * @return
+	 */
+	public String transferAccountToOtherServer(String username, String password, String age, String ip, String firstName, String lastName, int port, String fun) {
+
+		DatagramSocket ds = null;
+		byte[] b = new byte[65535];
+		try {
+			String request =  fun + "," + username + "," + password + "," + age + "," + ip + "," + firstName + "," + lastName;
+			ds = new DatagramSocket();
+			DatagramPacket dp = new DatagramPacket(
+				request.getBytes(), request.getBytes().length,
+				InetAddress.getByName("localhost"), port
+			);
+			ds.send(dp);
+			DatagramPacket dp1 = new DatagramPacket(b, b.length);
+			ds.receive(dp1);
+			String returnData = new String(dp1.getData());
+			return returnData.trim();
+		} catch (UnknownHostException e) {
+			logger.info(e.getMessage());
+		} catch (SocketException e) {
+			logger.info(e.getMessage());
+		} catch (IOException e) {
+			logger.info(e.getMessage());
+		} finally {
+			ds.close();
+		}
+		return "";
+	}
+	
+	/**
+	 * This method is used to return port based on ip
+	 * @param ip new ip of transfer account
+	 * @return ip
+	 */
+	public int getServerPort(String ip) {
+		if (ip.startsWith("132")) {
+			return 8882;
+		}
+		else if (ip.startsWith("93")) {
+			return 8880;
+		}
+		else if (ip.startsWith("182")) {
+			return 8881;
+		}
+		return 0;	
 	}
 	
 	/**

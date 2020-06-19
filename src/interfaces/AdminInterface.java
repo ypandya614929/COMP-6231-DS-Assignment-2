@@ -19,11 +19,12 @@ public interface AdminInterface extends Remote {
 	public String getPlayerStatus(String userName, String password, String ipAddress) throws IOException;
 	
 	/**
-	 * @param AdminUsername
-	 * @param AdminPassword
-	 * @param AdminIP
-	 * @param UsernameToSuspend
-	 * @return
+	 * This interface method is used to suspend player account
+	 * @param AdminUsername username of the admin
+	 * @param AdminPassword password of the admin
+	 * @param AdminIP ip of the admin
+	 * @param UsernameToSuspend player username
+	 * @return String containing success/error message
 	 * @throws IOException
 	 */
 	public String suspendAccount(String AdminUsername, String AdminPassword, String AdminIP, String UsernameToSuspend) throws IOException;

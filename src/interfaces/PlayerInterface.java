@@ -40,5 +40,16 @@ public interface PlayerInterface extends Remote {
 	 * @throws InterruptedException
 	 */
 	public String playerSignOut(String userName, String ipAddress) throws IOException, InterruptedException;
+	
+	/**
+	 * @param Username username of the player
+	 * @param Password password of the player
+	 * @param OldIPAddress old ipAddress ip of the player
+	 * @param NewIPAddress new ipAddress ip of the player
+	 * @return String containing success or error message
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public String transferAccount(String Username, String Password, String OldIPAddress, String NewIPAddress) throws IOException, InterruptedException;
 
 }

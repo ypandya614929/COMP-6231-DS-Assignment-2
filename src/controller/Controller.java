@@ -170,23 +170,23 @@ public class Controller extends UnicastRemoteObject implements PlayerInterface, 
 		if (ipAddress.startsWith("132")) {
 			output += naData.getPlayerStatus(userName, password, ipAddress);
 			output += " ";
-			output += DatafromOtherIP(userName, password, ipAddress, 8880);
+			output += DatafromOtherIP(userName, password, ipAddress, 8880, "getPlayerStatus");
 			output += " ";
-			output += DatafromOtherIP(userName, password, ipAddress, 8881);
+			output += DatafromOtherIP(userName, password, ipAddress, 8881, "getPlayerStatus");
 		}
 		else if (ipAddress.startsWith("93")) {
 			output += euData.getPlayerStatus(userName, password, ipAddress);
 			output += " ";
-			output += DatafromOtherIP(userName, password, ipAddress, 8881);
+			output += DatafromOtherIP(userName, password, ipAddress, 8881, "getPlayerStatus");
 			output += " ";
-			output += DatafromOtherIP(userName, password, ipAddress, 8882);
+			output += DatafromOtherIP(userName, password, ipAddress, 8882, "getPlayerStatus");
 		}
 		else if (ipAddress.startsWith("182")) {
 			output += asData.getPlayerStatus(userName, password, ipAddress);
 			output += " ";
-			output += DatafromOtherIP(userName, password, ipAddress, 8880);
+			output += DatafromOtherIP(userName, password, ipAddress, 8880, "getPlayerStatus");
 			output += " ";
-			output += DatafromOtherIP(userName, password, ipAddress, 8882);
+			output += DatafromOtherIP(userName, password, ipAddress, 8882, "getPlayerStatus");
 		}
 		return output;
 	}
@@ -216,20 +216,45 @@ public class Controller extends UnicastRemoteObject implements PlayerInterface, 
 	}
 	
 	/**
-	 * This method is used to communicate with the other servers to get the player status
+	 * This class overriden method is used to transfer player account if exists
+	 * @param Username username of the player
+	 * @param Password password of the player
+	 * @param OldIPAddress old ip of the player
+	 * @param NewIPAddress new ip of player
+	 * @return String containing success/error message
+	 * @throws IOException
+	 */
+	@Override
+	public String transferAccount(String Username, String Password, String OldIPAddress, String NewIPAddress) throws IOException {
+		String output = "";
+		if (OldIPAddress.startsWith("132")) {
+			output += naData.transferAccount(Username, Password, OldIPAddress, NewIPAddress);
+		}
+		else if (OldIPAddress.startsWith("93")) {
+			output += euData.transferAccount(Username, Password, OldIPAddress, NewIPAddress);
+		}
+		else if (OldIPAddress.startsWith("182")) {
+			output += asData.transferAccount(Username, Password, OldIPAddress, NewIPAddress);
+		}
+		return output;
+	}
+	
+	/**
+	 * This method is used to communicate with the other servers
 	 * counts for admin user
 	 * @param username username of the admin
 	 * @param password password of the admin
 	 * @param ip ip of the admin
 	 * @param port port of the other servers that are running on
+	 * @param fun
 	 * @return String containing number of online and offline players from port specific server
 	 */
-	public String DatafromOtherIP(String username, String password, String ip, int port) {
+	public String DatafromOtherIP(String username, String password, String ip, int port, String fun) {
 
 		DatagramSocket ds = null;
 		byte[] b = new byte[65535];
 		try {
-			String request = username + "," + password + "," + ip;
+			String request =  fun + "," + username + "," + password + "," + ip;
 			ds = new DatagramSocket();
 			DatagramPacket dp = new DatagramPacket(
 				request.getBytes(), request.getBytes().length,

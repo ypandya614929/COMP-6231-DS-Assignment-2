@@ -31,9 +31,9 @@ public class NorthAmerica {
 	 * Constructor to set controller object
 	 * @param aThis controller object
 	 */
-	public NorthAmerica(Controller aThis) {
+	public NorthAmerica(Controller c) {
 
-		this.controllerObj = aThis;
+		this.controllerObj = c;
 	}
 
 	/**
@@ -54,12 +54,24 @@ public class NorthAmerica {
 				ds.receive(dp);
 				byte[] data = dp.getData();
 				String[] data1 = new String(data).split(",");
-				String username = data1[0];
-				String password = data1[1];
-				String ip = data1[2];
+				String fun = data1[0];
 				String temp = "";
-				if (username.equals("Admin") && password.equals("Admin")) {
-					temp = controllerObj.naData.getPlayerStatus(username, password, ip);
+				if (fun.trim().equals("getPlayerStatus")) {
+					String username = data1[1];
+					String password = data1[2];
+					String ip = data1[3];
+					if (username.equals("Admin") && password.equals("Admin")) {
+						temp = controllerObj.naData.getPlayerStatus(username, password, ip);
+					}
+				}
+				else if (fun.trim().equals("transferAccount")) {
+					String username = data1[1];
+					String password = data1[2];
+					String age = data1[3];
+					String ip = data1[4];
+					String firstName = data1[5];
+					String lastName = data1[6];
+					temp = controllerObj.naData.createPlayerAccount(firstName, lastName, age, username, password, ip);
 				}
 				DatagramPacket dp1 = new DatagramPacket(temp.getBytes(), temp.length(),
 						dp.getAddress(), dp.getPort());
@@ -69,7 +81,6 @@ public class NorthAmerica {
 			} finally {
 				ds.close();
 			}
-
 		}
 	}
 	

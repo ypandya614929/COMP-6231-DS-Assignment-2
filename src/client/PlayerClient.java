@@ -62,7 +62,8 @@ public class PlayerClient {
 			System.out.println("1 : Create Player Account");
 			System.out.println("2 : Sign in");
 			System.out.println("3 : Sign out");
-			System.out.println("4 : Exit\n");
+			System.out.println("4 : Transfer Account");
+			System.out.println("5 : Exit\n");
 			System.out.print("Select : ");
 			String choice = br.readLine().trim();
 			if (choice.equals("1")){
@@ -75,6 +76,9 @@ public class PlayerClient {
 				signOut();
 			}
 			else if (choice.equals("4")){
+				transferAccount();
+			}
+			else if (choice.equals("5")){
 				break;
 			}
 			else {
@@ -443,6 +447,96 @@ public class PlayerClient {
 		}
 	}
 	
+	/**
+	 * This method is used to get input to transfer player account
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws NotBoundException
+	 */
+	public static void transferAccount() throws IOException, InterruptedException, NotBoundException{
+		boolean is_info_collected = false;
+		String username = "";
+		String password = "";
+		String ip = "";
+		String newip = "";
+		boolean returnMenu = false;
+		while (!returnMenu) {
+			if (!returnMenu) {
+				while (isNullOrEmpty(username)) {
+					System.out.print("Enter username : ");
+					username = br.readLine().trim();
+					if (isNullOrEmpty(username)) {
+						System.out.println("===== The username can't be empty. =====");
+						if(exitCheck()) {
+							returnMenu = true;
+							break;
+						}
+					}
+				}
+			}
+			if (!returnMenu) {
+				while (isNullOrEmpty(password)) {
+					System.out.print("Enter password : ");
+					password = br.readLine().trim();
+					if (isNullOrEmpty(password)) {
+						System.out.println("===== The password can't be empty. =====");
+						if(exitCheck()) {
+							returnMenu = true;
+							break;
+						}
+					}
+				}
+			}
+			if (!returnMenu) {
+				while (!ipCheck(ip) && !is_info_collected) {
+					System.out.print("Enter Old ip-address in following format 132.XXX.XXX.XXX or 93.XXX.XXX.XXX or 182.XXX.XXX.XXX : ");
+					ip = br.readLine().trim();
+					if (ipCheck(ip)) {
+						break;
+					}
+					else {
+						System.out.print("Enter Old ip-address in following format 132.XXX.XXX.XXX or 93.XXX.XXX.XXX or 182.XXX.XXX.XXX : ");
+						if (exitCheck()) {
+							returnMenu = true;
+							break;
+						}
+					}
+				}
+			}
+			if (!returnMenu) {
+				while (!ipCheck(newip) && !is_info_collected) {
+					System.out.print("Enter New ip-address in following format 132.XXX.XXX.XXX or 93.XXX.XXX.XXX or 182.XXX.XXX.XXX : ");
+					newip = br.readLine().trim();
+					if (ipCheck(newip)) {
+						returnMenu = true;
+						break;
+					}
+					else {
+						System.out.print("Enter New ip-address in following format 132.XXX.XXX.XXX or 93.XXX.XXX.XXX or 182.XXX.XXX.XXX : ");
+						if (exitCheck()) {
+							returnMenu = true;
+							break;
+						}
+					}
+				}
+			}
+			if (!isNullOrEmpty(username) && !isNullOrEmpty(password) && ipCheck(ip) && ipCheck(newip)) {
+				if(ip.substring(0, 2).equals(newip.substring(0, 2))) {
+					System.out.println("===== The player can't be transfered within same server. =====");
+				} else {
+					is_info_collected = true;
+				}
+			}
+		}
+		if (is_info_collected && ip!=null) {
+			addLog("logs/" + username + ".txt", username);
+			logger.info("IP : " + ip + ", username : " + username + ", start transferAccount() operation.");
+			createPlayerObject(ip);
+			String response = playerObj.transferAccount(username, password, ip, newip);
+			logger.info("IP : " + ip + ", username : " + username + ", Result transferAccount() : " + response);
+			System.out.println(response);
+		}
+	}
 	/**
 	 * This method is used to set/update logger
 	 * @param path

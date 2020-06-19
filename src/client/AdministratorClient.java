@@ -212,6 +212,12 @@ public class AdministratorClient {
 		}
 	}
 	
+	/**
+	 * This method is used to get input to suspend player account
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws NotBoundException
+	 */
 	public static void suspendAccount() throws IOException, InterruptedException, NotBoundException{
 		boolean is_info_collected = false;
 		String username = "";
