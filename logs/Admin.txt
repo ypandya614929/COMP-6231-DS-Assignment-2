@@ -1,0 +1,34 @@
+Jun 21, 2020 6:04:10 PM client.AdministratorClient addLog
+INFO: 
+Jun 21, 2020 6:04:10 PM client.AdministratorClient getPlayerStatus
+INFO: IP : 132.123.123.123, username : Admin, start getPlayerStatus() operation.
+Jun 21, 2020 6:04:10 PM client.AdministratorClient getPlayerStatus
+INFO: IP : 132.123.123.123, username : Admin, Result getPlayerStatus() : North American : 0 online , 0 offline.  Europe : 0 online , 0 offline. Asian : 0 online , 0 offline.
+Jun 21, 2020 6:04:46 PM client.AdministratorClient suspendAccount
+INFO: IP : 93.123.123.123, username : Admin, start suspendAccount() operation.
+Jun 21, 2020 6:04:46 PM client.AdministratorClient suspendAccount
+INFO: IP : 93.123.123.123, username : Admin, Result suspendAccount() : Invalid username or password
+Jun 21, 2020 6:04:59 PM client.AdministratorClient suspendAccount
+INFO: IP : 132.123.123.123, username : Admin, start suspendAccount() operation.
+Jun 21, 2020 6:04:59 PM client.AdministratorClient suspendAccount
+INFO: IP : 132.123.123.123, username : Admin, Result suspendAccount() : Player account (ypandya) doesn't exists
+Jun 21, 2020 6:05:54 PM client.AdministratorClient getPlayerStatus
+INFO: IP : 93.123.123.123, username : Admin, start getPlayerStatus() operation.
+Jun 21, 2020 6:05:54 PM client.AdministratorClient getPlayerStatus
+INFO: IP : 93.123.123.123, username : Admin, Result getPlayerStatus() : Europe : 0 online , 0 offline.  Asian : 0 online , 0 offline. North American : 0 online , 1 offline.
+Jun 21, 2020 6:06:35 PM client.AdministratorClient getPlayerStatus
+INFO: IP : 132.123.123.123, username : Admin, start getPlayerStatus() operation.
+Jun 21, 2020 6:06:35 PM client.AdministratorClient getPlayerStatus
+INFO: IP : 132.123.123.123, username : Admin, Result getPlayerStatus() : North American : 1 online , 0 offline.  Europe : 0 online , 0 offline. Asian : 0 online , 0 offline.
+Jun 21, 2020 6:08:15 PM client.AdministratorClient getPlayerStatus
+INFO: IP : 93.123.123.123, username : Admin, start getPlayerStatus() operation.
+Jun 21, 2020 6:08:16 PM client.AdministratorClient getPlayerStatus
+INFO: IP : 93.123.123.123, username : Admin, Result getPlayerStatus() : Europe : 0 online , 1 offline.  Asian : 0 online , 0 offline. North American : 0 online , 0 offline.
+Jun 21, 2020 6:08:32 PM client.AdministratorClient suspendAccount
+INFO: IP : 93.123.123.123, username : Admin, start suspendAccount() operation.
+Jun 21, 2020 6:08:32 PM client.AdministratorClient suspendAccount
+INFO: IP : 93.123.123.123, username : Admin, Result suspendAccount() : Player account (ypandya) is suspended
+Jun 21, 2020 6:08:38 PM client.AdministratorClient getPlayerStatus
+INFO: IP : 132.132.123.123, username : Admin, start getPlayerStatus() operation.
+Jun 21, 2020 6:08:38 PM client.AdministratorClient getPlayerStatus
+INFO: IP : 132.132.123.123, username : Admin, Result getPlayerStatus() : North American : 0 online , 0 offline.  Europe : 0 online , 0 offline. Asian : 0 online , 0 offline.

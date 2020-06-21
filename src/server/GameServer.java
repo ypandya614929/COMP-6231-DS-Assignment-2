@@ -51,8 +51,8 @@ public class GameServer {
 			org.omg.CORBA.Object refEU = rootpoa.servant_to_reference(europe);
 			DPSSInterface hrefEU = DPSSInterfaceHelper.narrow(refEU);
 			NamingContextExt ncRefEU = NamingContextExtHelper.narrow(objRef);		
-            NameComponent pathTor[] = ncRefEU.to_name("EU");
-            ncRefEU.rebind(pathTor, hrefEU);
+            NameComponent pathEU[] = ncRefEU.to_name("EU");
+            ncRefEU.rebind(pathEU, hrefEU);
             
     		Controller northamerica = new Controller("NA");
     		northamerica.setORB(orb);

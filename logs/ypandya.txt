@@ -1,0 +1,30 @@
+Jun 21, 2020 6:05:12 PM client.PlayerClient addLog
+INFO: 
+Jun 21, 2020 6:05:12 PM client.PlayerClient signIn
+INFO: IP : 132.123.132.321, username : ypandya, start playerSignIn() operation.
+Jun 21, 2020 6:05:12 PM client.PlayerClient signIn
+INFO: IP : 132.123.132.321, username : ypandya, Result playerSignIn() : Player account (ypandya) doesn't exists
+Jun 21, 2020 6:05:43 PM client.PlayerClient createAccount
+INFO: IP : 132.123.123.123, username : ypandya, start createPlayerAccount() operation.
+Jun 21, 2020 6:05:43 PM client.PlayerClient createAccount
+INFO: IP : 132.123.123.123, username : ypandya, Result createPlayerAccount() : Player created successfully
+Jun 21, 2020 6:06:09 PM client.PlayerClient signOut
+INFO: IP : 132.123.123.123, username : ypandya, start playerSignOut() operation.
+Jun 21, 2020 6:06:09 PM client.PlayerClient signOut
+INFO: IP : 132.123.123.123, username : ypandya, Result playerSignOut() : Player is not signed in
+Jun 21, 2020 6:06:20 PM client.PlayerClient signIn
+INFO: IP : 132.123.123.123, username : ypandya, start playerSignIn() operation.
+Jun 21, 2020 6:06:20 PM client.PlayerClient signIn
+INFO: IP : 132.123.123.123, username : ypandya, Result playerSignIn() : Player sign in successfully
+Jun 21, 2020 6:07:07 PM client.PlayerClient transferAccount
+INFO: IP : 132.123.123.123, username : ypandya, start transferAccount() operation.
+Jun 21, 2020 6:07:07 PM client.PlayerClient transferAccount
+INFO: IP : 132.123.123.123, username : ypandya, Result transferAccount() : Invalid IP address or Password
+Jun 21, 2020 6:07:36 PM client.PlayerClient transferAccount
+INFO: IP : 132.123.123.123, username : ypandya, start transferAccount() operation.
+Jun 21, 2020 6:07:36 PM client.PlayerClient transferAccount
+INFO: IP : 132.123.123.123, username : ypandya, Result transferAccount() : Player account (ypandya) is transfered from 132.123.123.123 to 93.123.123.123
+Jun 21, 2020 6:08:49 PM client.PlayerClient signOut
+INFO: IP : 93.123.123.123, username : ypandya, start playerSignOut() operation.
+Jun 21, 2020 6:08:49 PM client.PlayerClient signOut
+INFO: IP : 93.123.123.123, username : ypandya, Result playerSignOut() : Player account (ypandya) doesn't exists
