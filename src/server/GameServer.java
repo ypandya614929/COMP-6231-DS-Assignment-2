@@ -1,20 +1,25 @@
 package server;
 //References:
 //https://systembash.com/a-simple-java-udp-server-and-udp-client/
-//https://www.tutorialspoint.com/java_rmi/java_rmi_introduction.htm
-//https://www.javatpoint.com/RMI
 //https://www.geeksforgeeks.org/multithreading-in-java/
 //https://www.geeksforgeeks.org/synchronized-in-java/
+//https://objectcomputing.com/resources/publications/sett/january-2002-corba-and-java-by-don-busch-principal-software-engineer
+//http://www.ejbtutorial.com/corba/tutorial-for-corba-hello-world-using-java
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.rmi.AlreadyBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
+
+import org.omg.PortableServer.POA;
+import org.omg.PortableServer.POAHelper;
+import org.omg.CosNaming.NameComponent;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.CORBA.ORB;
 
 import controller.Controller;
+import DPSSCorba.DPSSInterfaceHelper;
+import DPSSCorba.DPSSInterface;
 /**
  *
  * @author ypandya
@@ -28,31 +33,58 @@ public class GameServer {
 	/**
 	 * main method to run all the servers
 	 * @param args args for main function
-	 * @throws AlreadyBoundException exception of already bound with server 
-	 * @throws RemoteException remote exception
 	 */
-	public static void main(String args[]) throws AlreadyBoundException, RemoteException {
+	public static void main(String args[]) {
 		
 		buildLogDirectory("./logs");
 		
-		Controller europe = new Controller("EU");
-		Controller northamerica = new Controller("NA");
-		Controller asia = new Controller("AS");
+		try {
+			
+			// create and initialize the ORB
+			ORB orb = ORB.init(args, null);
+			POA rootpoa = POAHelper.narrow(orb.resolve_initial_references("RootPOA"));
+			rootpoa.the_POAManager().activate();
+			org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+			
+			Controller europe = new Controller("EU");
+			europe.setORB(orb);
+			org.omg.CORBA.Object refEU = rootpoa.servant_to_reference(europe);
+			DPSSInterface hrefEU = DPSSInterfaceHelper.narrow(refEU);
+			NamingContextExt ncRefEU = NamingContextExtHelper.narrow(objRef);		
+            NameComponent pathTor[] = ncRefEU.to_name("EU");
+            ncRefEU.rebind(pathTor, hrefEU);
+            
+    		Controller northamerica = new Controller("NA");
+    		northamerica.setORB(orb);
+			org.omg.CORBA.Object refNA = rootpoa.servant_to_reference(northamerica);
+			DPSSInterface hrefNA = DPSSInterfaceHelper.narrow(refNA);
+			NamingContextExt ncRefNA = NamingContextExtHelper.narrow(objRef);		
+            NameComponent pathNA[] = ncRefNA.to_name("NA");
+            ncRefNA.rebind(pathNA, hrefNA);
+            
+    		Controller asia = new Controller("AS");
+    		asia.setORB(orb);
+			org.omg.CORBA.Object refAS = rootpoa.servant_to_reference(asia);
+			DPSSInterface hrefAS = DPSSInterfaceHelper.narrow(refAS);
+			NamingContextExt ncRefAS = NamingContextExtHelper.narrow(objRef);		
+            NameComponent pathAS[] = ncRefEU.to_name("AS");
+            ncRefAS.rebind(pathAS, hrefAS);
+            
+            System.out.println("Server(s) are Started");
+    		
+//    		loadData(europe, northamerica, asia);
+    		
+//    		System.out.println("Initial data loaded into server");
+    		
+            // client's invocations
+    		for (;;) { orb.run(); }
+    		
+		} catch (Exception e) {
+			e.printStackTrace(System.out);
+		}
 		
-		Registry registry1 = LocateRegistry.createRegistry(9990);
-		registry1.bind("North America", northamerica);
+		System.out.println("Server(s) are closed");
 		
-		Registry registry2 = LocateRegistry.createRegistry(9991);
-		registry2.bind("Europe", europe);
-		
-		Registry registry3 = LocateRegistry.createRegistry(9992);
-		registry3.bind("Asia", asia);
-				
-		System.out.println("Server(s) are Started");
-		
-//		loadData(europe, northamerica, asia);
-		
-//		System.out.println("Initial data loaded into server");
 	}
 	
 	/**

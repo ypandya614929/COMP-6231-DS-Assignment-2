@@ -1,26 +1,30 @@
 package client;
 //References:
 //https://systembash.com/a-simple-java-udp-server-and-udp-client/
-//https://www.tutorialspoint.com/java_rmi/java_rmi_introduction.htm
-//https://www.javatpoint.com/RMI
 //https://www.geeksforgeeks.org/multithreading-in-java/
 //https://www.geeksforgeeks.org/synchronized-in-java/
+//https://objectcomputing.com/resources/publications/sett/january-2002-corba-and-java-by-don-busch-principal-software-engineer
+//http://www.ejbtutorial.com/corba/tutorial-for-corba-hello-world-using-java
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.logging.FileHandler;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.rmi.AccessException;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import interfaces.AdminInterface;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.CosNaming.NamingContextPackage.CannotProceed;
+import org.omg.CosNaming.NamingContextPackage.InvalidName;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
+import org.omg.CORBA.ORB;
+
+import controller.Controller;
+import DPSSCorba.DPSSInterface;
+import DPSSCorba.DPSSInterfaceHelper;
 
 /**
  *
@@ -31,51 +35,60 @@ public class AdministratorClient {
 	/**
 	 * This is the admin user class containing admin user operations
 	 */
-	static AdminInterface adminObj;
-	static Registry registry1;
-	static Registry registry2;
-	static Registry registry3;
+	static DPSSInterface adminObj;
+	static Controller controller;
 	static BufferedReader br;
+	static NamingContextExt ncRef;
 	private static Logger logger;
 	
 	/**
 	 * main method to run the admin user operations
 	 * @param args
-	 * @throws NotBoundException
+	 
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public static void main(String[] args) throws NotBoundException, IOException, InterruptedException {
-
-		registry1 = LocateRegistry.getRegistry(9990);
-		registry2 = LocateRegistry.getRegistry(9991);
-		registry3 = LocateRegistry.getRegistry(9992);
+	public static void main(String[] args) throws IOException, InterruptedException {
 		
-		br = new BufferedReader(new InputStreamReader(System.in));
-		while (true) {
-			adminObj = null;
-			System.out.println("\nDistributed Player Status System");
-			System.out.println("================================");
-			System.out.println("Admin Options : \n");
-			System.out.println("1 : Get Player status");
-			System.out.println("2 : Suspend Player Account");
-			System.out.println("3 : Exit\n");
-			System.out.print("Select : ");
-			String choice = br.readLine().trim();
-			if (choice.equals("1")){
-				getPlayerStatus();
+		controller = null;
+		
+		try {
+			
+			ORB orb = ORB.init(args, null);
+			org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+			ncRef = NamingContextExtHelper.narrow(objRef);
+			
+			br = new BufferedReader(new InputStreamReader(System.in));
+			while (true) {
+				adminObj = null;
+				System.out.println("\nDistributed Player Status System");
+				System.out.println("================================");
+				System.out.println("Admin Options : \n");
+				System.out.println("1 : Get Player status");
+				System.out.println("2 : Suspend Player Account");
+				System.out.println("3 : Exit\n");
+				System.out.print("Select : ");
+				String choice = br.readLine().trim();
+				if (choice.equals("1")){
+					getPlayerStatus();
+				}
+				else if (choice.equals("2")){
+					suspendAccount();
+				}
+				else if (choice.equals("3")){
+					break;
+				}
+				else {
+					System.out.println("===== Please select valid option =====");
+					continue;
+				}
 			}
-			else if (choice.equals("2")){
-				suspendAccount();
-			}
-			else if (choice.equals("3")){
-				break;
-			}
-			else {
-				System.out.println("===== Please select valid option =====");
-				continue;
-			}
+			
+		} catch (Exception e) {
+			System.out.println("Something went wrong while starting administrator");
+			e.printStackTrace();
 		}
+		
 	}
 		
 	/**
@@ -146,9 +159,11 @@ public class AdministratorClient {
 	 * This method is used to get input to get player status
 	 * @throws IOException
 	 * @throws InterruptedException
-	 * @throws NotBoundException
+	 * @throws InvalidName 
+	 * @throws CannotProceed 
+	 * @throws NotFound 
 	 */
-	public static void getPlayerStatus() throws IOException, InterruptedException, NotBoundException{
+	public static void getPlayerStatus() throws IOException, InterruptedException, NotFound, CannotProceed, InvalidName{
 		boolean is_info_collected = false;
 		String username = "";
 		String password = "";
@@ -204,7 +219,7 @@ public class AdministratorClient {
 		}
 		if (is_info_collected && ip!=null) {
 			addLog("logs/" + username + ".txt", username);
-			createAdminObject(ip);
+			adminObj = createAdminObject(ip);
 			logger.info("IP : " + ip + ", username : " + username + ", start getPlayerStatus() operation.");
 			String response = adminObj.getPlayerStatus(username, password, ip);
 			logger.info("IP : " + ip + ", username : " + username + ", Result getPlayerStatus() : " + response);
@@ -216,9 +231,11 @@ public class AdministratorClient {
 	 * This method is used to get input to suspend player account
 	 * @throws IOException
 	 * @throws InterruptedException
-	 * @throws NotBoundException
+	 * @throws InvalidName 
+	 * @throws CannotProceed 
+	 * @throws NotFound 
 	 */
-	public static void suspendAccount() throws IOException, InterruptedException, NotBoundException{
+	public static void suspendAccount() throws IOException, InterruptedException, NotFound, CannotProceed, InvalidName{
 		boolean is_info_collected = false;
 		String username = "";
 		String password = "";
@@ -290,7 +307,7 @@ public class AdministratorClient {
 		}
 		if (is_info_collected && ip!=null) {
 			addLog("logs/" + username + ".txt", username);
-			createAdminObject(ip);
+			adminObj = createAdminObject(ip);
 			logger.info("IP : " + ip + ", username : " + username + ", start suspendAccount() operation.");
 			String response = adminObj.suspendAccount(username, password, ip, playerUsername);
 			logger.info("IP : " + ip + ", username : " + username + ", Result suspendAccount() : " + response);
@@ -334,21 +351,24 @@ public class AdministratorClient {
 	
 	/**
 	 * This method is used to set the server object based on the ip
-	 * @param ip
+	 * @param ip ip address
 	 * @throws AccessException
 	 * @throws RemoteException
-	 * @throws NotBoundException
+	 * @throws InvalidName 
+	 * @throws CannotProceed 
+	 * @throws NotFound 
 	 */
-	public static void createAdminObject(String ip) throws AccessException, RemoteException, NotBoundException {
+	public static DPSSInterface createAdminObject(String ip) throws NotFound, CannotProceed, InvalidName {
 		if (ip.startsWith("132")) {
-			adminObj = (AdminInterface) registry1.lookup("North America");
+			return DPSSInterfaceHelper.narrow(ncRef.resolve_str("NA"));
 		} 
 		else if (ip.startsWith("93")) {
-			adminObj = (AdminInterface) registry2.lookup("Europe");
+			return DPSSInterfaceHelper.narrow(ncRef.resolve_str("EU"));
 		} 
 		else if (ip.startsWith("182")) {
-			adminObj = (AdminInterface) registry3.lookup("Asia");
+			return DPSSInterfaceHelper.narrow(ncRef.resolve_str("AS"));
 		}
+		return null;
 	}
 }
 	

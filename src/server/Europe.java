@@ -1,10 +1,10 @@
 package server;
 //References:
 //https://systembash.com/a-simple-java-udp-server-and-udp-client/
-//https://www.tutorialspoint.com/java_rmi/java_rmi_introduction.htm
-//https://www.javatpoint.com/RMI
 //https://www.geeksforgeeks.org/multithreading-in-java/
 //https://www.geeksforgeeks.org/synchronized-in-java/
+//https://objectcomputing.com/resources/publications/sett/january-2002-corba-and-java-by-don-busch-principal-software-engineer
+//http://www.ejbtutorial.com/corba/tutorial-for-corba-hello-world-using-java
 import java.io.File;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

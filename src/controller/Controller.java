@@ -6,33 +6,33 @@
 package controller;
 //References:
 //https://systembash.com/a-simple-java-udp-server-and-udp-client/
-//https://www.tutorialspoint.com/java_rmi/java_rmi_introduction.htm
-//https://www.javatpoint.com/RMI
 //https://www.geeksforgeeks.org/multithreading-in-java/
 //https://www.geeksforgeeks.org/synchronized-in-java/
+//https://objectcomputing.com/resources/publications/sett/january-2002-corba-and-java-by-don-busch-principal-software-engineer
+//http://www.ejbtutorial.com/corba/tutorial-for-corba-hello-world-using-java
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.logging.Logger;
 
-import interfaces.AdminInterface;
-import interfaces.PlayerInterface;
+import org.omg.CORBA.ORB;
+
 import server.Asia;
 import server.NorthAmerica;
 import server.Europe;
 import model.NAData;
 import model.ASData;
 import model.EUData;
+
+import DPSSCorba.DPSSInterfacePOA;
 /**
  *
  * @author ypandya
  */
-public class Controller extends UnicastRemoteObject implements PlayerInterface, AdminInterface {
+public class Controller extends DPSSInterfacePOA {
 
 	/**
 	 * This is the Controller class that handles data manipulation
@@ -40,18 +40,23 @@ public class Controller extends UnicastRemoteObject implements PlayerInterface, 
 	 */
 	public String IP;
 	public String returnData;
-	private static Logger logger;
-	private static final long serialVersionUID = 1L;
 	public NAData naData;
 	public ASData asData;
 	public EUData euData;
+	private ORB orb;
+	private static Logger logger;
+	private static final long serialVersionUID = 1L;
+	
+	public void setORB(ORB orb_val) {
+        orb = orb_val;
+    }
 	
 	/**
 	 * Controller constructor
 	 * @param IP
 	 * @throws RemoteException
 	 */
-	public Controller(String IP) throws RemoteException {
+	public Controller(String IP) {
 		super();
 		naData = new NAData();
 		asData = new ASData();
@@ -93,10 +98,9 @@ public class Controller extends UnicastRemoteObject implements PlayerInterface, 
 	 * @param password password of the player
 	 * @param ipAddress ip of the player
 	 * @return String containing success or error message
-	 * @throws IOException
 	 */
 	@Override
-	public String createPlayerAccount(String firstName, String lastName, String age, String userName, String password, String ipAddress) throws IOException {
+	public String createPlayerAccount(String firstName, String lastName, String age, String userName, String password, String ipAddress) {
 		String output = "";
 		if (ipAddress.startsWith("132")) {
 			output = naData.createPlayerAccount(firstName, lastName, age, userName, password, ipAddress);
@@ -116,10 +120,9 @@ public class Controller extends UnicastRemoteObject implements PlayerInterface, 
 	 * @param password password of the player
 	 * @param ipAddress ip of the player
 	 * @return String containing success or error message
-	 * @throws IOException
 	 */
 	@Override
-	public String playerSignIn(String userName, String password, String ipAddress) throws IOException {
+	public String playerSignIn(String userName, String password, String ipAddress) {
 		String output = "";
 		if (ipAddress.startsWith("132")) {
 			output = naData.playerSignIn(userName, password, ipAddress);
@@ -138,11 +141,9 @@ public class Controller extends UnicastRemoteObject implements PlayerInterface, 
 	 * @param userName username of the player
 	 * @param ipAddress ip of the player
 	 * @return String containing success or error message
-	 * @throws IOException
-	 * @throws InterruptedException
 	 */
 	@Override
-	public String playerSignOut(String userName, String ipAddress) throws IOException, InterruptedException {
+	public String playerSignOut(String userName, String ipAddress) {
 		String output = "";
 		if (ipAddress.startsWith("132")) {
 			output = naData.playerSignOut(userName, ipAddress);
@@ -162,10 +163,9 @@ public class Controller extends UnicastRemoteObject implements PlayerInterface, 
 	 * @param password password of the admin
 	 * @param ipAddress ip of the admin
 	 * @return String containing number of online and offline players
-	 * @throws IOException
 	 */
 	@Override
-	public String getPlayerStatus(String userName, String password, String ipAddress) throws IOException {
+	synchronized public String getPlayerStatus(String userName, String password, String ipAddress) {
 		String output = "";
 		if (ipAddress.startsWith("132")) {
 			output += naData.getPlayerStatus(userName, password, ipAddress);
@@ -198,10 +198,9 @@ public class Controller extends UnicastRemoteObject implements PlayerInterface, 
 	 * @param AdminIP ip of the admin
 	 * @param UsernameToSuspend username of player account whom is going to be suspended
 	 * @return String containing success/error message
-	 * @throws IOException
 	 */
 	@Override
-	public String suspendAccount(String AdminUsername, String AdminPassword, String AdminIP, String UsernameToSuspend) throws IOException {
+	public String suspendAccount(String AdminUsername, String AdminPassword, String AdminIP, String UsernameToSuspend) {
 		String output = "";
 		if (AdminIP.startsWith("132")) {
 			output += naData.suspendAccount(AdminUsername, AdminPassword, AdminIP, UsernameToSuspend);
@@ -222,10 +221,9 @@ public class Controller extends UnicastRemoteObject implements PlayerInterface, 
 	 * @param OldIPAddress old ip of the player
 	 * @param NewIPAddress new ip of player
 	 * @return String containing success/error message
-	 * @throws IOException
 	 */
 	@Override
-	public String transferAccount(String Username, String Password, String OldIPAddress, String NewIPAddress) throws IOException {
+	public String transferAccount(String Username, String Password, String OldIPAddress, String NewIPAddress) {
 		String output = "";
 		if (OldIPAddress.startsWith("132")) {
 			output += naData.transferAccount(Username, Password, OldIPAddress, NewIPAddress);

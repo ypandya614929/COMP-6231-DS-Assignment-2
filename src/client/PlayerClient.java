@@ -1,27 +1,30 @@
 package client;
 //References:
 //https://systembash.com/a-simple-java-udp-server-and-udp-client/
-//https://www.tutorialspoint.com/java_rmi/java_rmi_introduction.htm
-//https://www.javatpoint.com/RMI
 //https://www.geeksforgeeks.org/multithreading-in-java/
 //https://www.geeksforgeeks.org/synchronized-in-java/
+//https://objectcomputing.com/resources/publications/sett/january-2002-corba-and-java-by-don-busch-principal-software-engineer
+//http://www.ejbtutorial.com/corba/tutorial-for-corba-hello-world-using-java
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.rmi.AccessException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import interfaces.PlayerInterface;
+import org.omg.CosNaming.NamingContextExt;
+import org.omg.CosNaming.NamingContextExtHelper;
+import org.omg.CosNaming.NamingContextPackage.CannotProceed;
+import org.omg.CosNaming.NamingContextPackage.InvalidName;
+import org.omg.CosNaming.NamingContextPackage.NotFound;
+import org.omg.CORBA.ORB;
 
-import java.io.File;
+import controller.Controller;
+import DPSSCorba.DPSSInterface;
+import DPSSCorba.DPSSInterfaceHelper;
 
 /**
  *
@@ -32,60 +35,68 @@ public class PlayerClient {
 	/**
 	 * This is the player user class containing player user operations
 	 */
-	static Registry reg1;
-	static Registry reg2;
-	static Registry reg3;
-	static PlayerInterface playerObj;
+
+	static DPSSInterface playerObj;
+	static Controller controller;
 	static BufferedReader br;
 	private static Logger logger;
+	static NamingContextExt ncRef;
 	private static String str2;
 
 	/**
 	 * main method to run the player user operations
 	 * @param args
-	 * @throws NotBoundException
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public static void main(String[] args) throws NotBoundException, IOException, InterruptedException {
+	public static void main(String[] args) throws IOException, InterruptedException {
+				
+		controller = null;
 		
-		reg1 = LocateRegistry.getRegistry(9990);
-		reg2 = LocateRegistry.getRegistry(9991);
-		reg3 = LocateRegistry.getRegistry(9992);
-		
-		br = new BufferedReader(new InputStreamReader(System.in));
-		while (true) {
-			playerObj = null;
-			System.out.println("\nDistributed Player Status System");
-			System.out.println("================================");
-			System.out.println("Player Options : \n");
-			System.out.println("1 : Create Player Account");
-			System.out.println("2 : Sign in");
-			System.out.println("3 : Sign out");
-			System.out.println("4 : Transfer Account");
-			System.out.println("5 : Exit\n");
-			System.out.print("Select : ");
-			String choice = br.readLine().trim();
-			if (choice.equals("1")){
-				createAccount();
+		try {
+			
+			ORB orb = ORB.init(args, null);
+			org.omg.CORBA.Object objRef = orb.resolve_initial_references("NameService");
+			ncRef = NamingContextExtHelper.narrow(objRef);
+			
+			br = new BufferedReader(new InputStreamReader(System.in));
+			while (true) {
+				playerObj = null;
+				System.out.println("\nDistributed Player Status System");
+				System.out.println("================================");
+				System.out.println("Player Options : \n");
+				System.out.println("1 : Create Player Account");
+				System.out.println("2 : Sign in");
+				System.out.println("3 : Sign out");
+				System.out.println("4 : Transfer Account");
+				System.out.println("5 : Exit\n");
+				System.out.print("Select : ");
+				String choice = br.readLine().trim();
+				if (choice.equals("1")){
+					createAccount();
+				}
+				else if (choice.equals("2")){
+					signIn();
+				}
+				else if (choice.equals("3")){
+					signOut();
+				}
+				else if (choice.equals("4")){
+					transferAccount();
+				}
+				else if (choice.equals("5")){
+					break;
+				}
+				else {
+					System.out.println("===== Please select valid option =====");
+					continue;
+				}
 			}
-			else if (choice.equals("2")){
-				signIn();
-			}
-			else if (choice.equals("3")){
-				signOut();
-			}
-			else if (choice.equals("4")){
-				transferAccount();
-			}
-			else if (choice.equals("5")){
-				break;
-			}
-			else {
-				System.out.println("===== Please select valid option =====");
-				continue;
-			}
+		} catch (Exception e) {
+			System.out.println("Something went wrong while starting player");
+			e.printStackTrace();
 		}
+		
 	}
 		
 	/**
@@ -213,9 +224,11 @@ public class PlayerClient {
 	 * This method is used to get input to create player account
 	 * @throws IOException
 	 * @throws InterruptedException
-	 * @throws NotBoundException
+	 * @throws InvalidName 
+	 * @throws CannotProceed 
+	 * @throws NotFound 
 	 */
-	public static void createAccount() throws IOException, InterruptedException, NotBoundException{
+	public static void createAccount() throws IOException, InterruptedException, NotFound, CannotProceed, InvalidName{
 		boolean is_info_collected = false;
 		String firstname = "";
 		String lastname = "";
@@ -314,7 +327,7 @@ public class PlayerClient {
 		if (is_info_collected && ip!=null) {
 			addLog("logs/" + username + ".txt", username);
 			logger.info("IP : " + ip + ", username : " + username + ", start createPlayerAccount() operation.");
-			createPlayerObject(ip);
+			playerObj = createPlayerObject(ip);
 			String response = playerObj.createPlayerAccount(firstname, lastname, age, username, password, ip);
 			logger.info("IP : " + ip + ", username : " + username + ", Result createPlayerAccount() : " + response);
 			System.out.println(response);
@@ -325,9 +338,11 @@ public class PlayerClient {
 	 * This method is used to get input to sign in the player
 	 * @throws IOException
 	 * @throws InterruptedException
-	 * @throws NotBoundException
+	 * @throws InvalidName 
+	 * @throws CannotProceed 
+	 * @throws NotFound 
 	 */
-	public static void signIn() throws IOException, InterruptedException, NotBoundException{
+	public static void signIn() throws IOException, InterruptedException, NotFound, CannotProceed, InvalidName{
 		boolean is_info_collected = false;
 		String username = "";
 		String password = "";
@@ -384,7 +399,7 @@ public class PlayerClient {
 		if (is_info_collected && ip!=null) {
 			addLog("logs/" + username + ".txt", username);
 			logger.info("IP : " + ip + ", username : " + username + ", start playerSignIn() operation.");
-			createPlayerObject(ip);
+			playerObj = createPlayerObject(ip);
 			String response = playerObj.playerSignIn(username, password, ip);
 			logger.info("IP : " + ip + ", username : " + username + ", Result playerSignIn() : " + response);
 			System.out.println(response);
@@ -395,9 +410,11 @@ public class PlayerClient {
 	 * This method is used to get input to sign out the player
 	 * @throws IOException
 	 * @throws InterruptedException
-	 * @throws NotBoundException
+	 * @throws InvalidName 
+	 * @throws CannotProceed 
+	 * @throws NotFound 
 	 */
-	public static void signOut() throws IOException, InterruptedException, NotBoundException{
+	public static void signOut() throws IOException, InterruptedException, NotFound, CannotProceed, InvalidName{
 		boolean is_info_collected = false;
 		String username = "";
 		String ip = "";
@@ -440,7 +457,7 @@ public class PlayerClient {
 		if (is_info_collected && ip!=null) {
 			addLog("logs/" + username + ".txt", username);
 			logger.info("IP : " + ip + ", username : " + username + ", start playerSignOut() operation.");
-			createPlayerObject(ip);
+			playerObj = createPlayerObject(ip);
 			String response = playerObj.playerSignOut(username, ip);
 			logger.info("IP : " + ip + ", username : " + username + ", Result playerSignOut() : " + response);
 			System.out.println(response);
@@ -451,9 +468,11 @@ public class PlayerClient {
 	 * This method is used to get input to transfer player account
 	 * @throws IOException
 	 * @throws InterruptedException
-	 * @throws NotBoundException
+	 * @throws InvalidName 
+	 * @throws CannotProceed 
+	 * @throws NotFound 
 	 */
-	public static void transferAccount() throws IOException, InterruptedException, NotBoundException{
+	public static void transferAccount() throws IOException, InterruptedException, NotFound, CannotProceed, InvalidName{
 		boolean is_info_collected = false;
 		String username = "";
 		String password = "";
@@ -531,7 +550,7 @@ public class PlayerClient {
 		if (is_info_collected && ip!=null) {
 			addLog("logs/" + username + ".txt", username);
 			logger.info("IP : " + ip + ", username : " + username + ", start transferAccount() operation.");
-			createPlayerObject(ip);
+			playerObj = createPlayerObject(ip);
 			String response = playerObj.transferAccount(username, password, ip, newip);
 			logger.info("IP : " + ip + ", username : " + username + ", Result transferAccount() : " + response);
 			System.out.println(response);
@@ -573,22 +592,22 @@ public class PlayerClient {
 	
 	/**
 	 * This method is used to set the server object based on the ip
-	 * @param ip
-	 * @throws AccessException
-	 * @throws RemoteException
-	 * @throws NotBoundException
+	 * @param ip ip address
+	 * @throws InvalidName 
+	 * @throws CannotProceed 
+	 * @throws NotFound 
 	 */
-	public static void createPlayerObject(String ip)
-			throws AccessException, RemoteException, NotBoundException {
+	public static DPSSInterface createPlayerObject(String ip) throws NotFound, CannotProceed, InvalidName {
 		if (ip.startsWith("132")) {
-			playerObj = (PlayerInterface) reg1.lookup("North America");
+			return DPSSInterfaceHelper.narrow(ncRef.resolve_str("NA"));
 		} 
 		else if (ip.startsWith("93")) {
-			playerObj = (PlayerInterface) reg2.lookup("Europe");
+			return DPSSInterfaceHelper.narrow(ncRef.resolve_str("EU"));
 		} 
 		else if (ip.startsWith("182")) {
-			playerObj = (PlayerInterface) reg3.lookup("Asia");
+			return DPSSInterfaceHelper.narrow(ncRef.resolve_str("AS"));
 		}
+		return null;
 	}
 }
 	

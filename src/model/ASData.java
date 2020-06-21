@@ -242,8 +242,8 @@ public class ASData {
 				return "Invalid password or IP address";
 			}
 		}
-		logger.info("IP : " + ipAddress + ", username : " + userName + ", Result playerSignIn() : Player doesn't exists");
-		return "Player doesn't exists";
+		logger.info("IP : " + ipAddress + ", username : " + userName + ", Result playerSignIn() : Player account ("+ userName +") doesn't exists");
+		return "Player account ("+ userName +") doesn't exists";
 	}
 	
 	/**
@@ -274,8 +274,8 @@ public class ASData {
 				return "Invalid IP address";
 			}
 		}
-		logger.info("IP : " + ipAddress + ", username : " + userName + ", Result playerSignOut() : Player doesn't exists");
-		return "Player doesn't exists";
+		logger.info("IP : " + ipAddress + ", username : " + userName + ", Result playerSignOut() : Player account ("+ userName +") doesn't exists");
+		return "Player account ("+ userName +") doesn't exists";
 	}
 	
 	/**
@@ -294,26 +294,24 @@ public class ASData {
 			HashMap<String,Player> playerData = playerserverData.get(key);
 			if (playerData.containsKey(Username)) {
 				playerObj = playerData.get(Username);
-				synchronized(playerObj) {
-					if (playerObj.userName.equals(Username) && playerObj.ipAddress.equals(OldIPAddress) && playerObj.password.equals(Password)) {
-						int port = getServerPort(NewIPAddress);
-						String data = transferAccountToOtherServer(playerObj.getUserName(), playerObj.getPassword(), playerObj.age, NewIPAddress, playerObj.getFirstName(), playerObj.getLastName(),port, "transferAccount");
-						if (data.trim().equals("Player created successfully")) {
-							playerData.remove(Username);
-							logger.info("IP : " + OldIPAddress + ", username : " + Username + ", Result transferAccount() : Player account is transfered from " + OldIPAddress + " to " + NewIPAddress);
-							return "Player account is transfered from " + OldIPAddress + " to " + NewIPAddress;
-						} else {
-							logger.info("IP : " + OldIPAddress + ", username : " + Username + ", Result transferAccount() : Player account is not transfered");
-							return "Player account is not transfered";
-						}
+				if (playerObj.userName.equals(Username) && playerObj.ipAddress.equals(OldIPAddress) && playerObj.password.equals(Password)) {
+					int port = getServerPort(NewIPAddress);
+					String data = transferAccountToOtherServer(playerObj.getUserName(), playerObj.getPassword(), playerObj.age, NewIPAddress, playerObj.getFirstName(), playerObj.getLastName(),port, "transferAccount");
+					if (data.trim().equals("Player created successfully")) {
+						playerData.remove(Username);
+						logger.info("IP : " + OldIPAddress + ", username : " + Username + ", Result transferAccount() : Player account ("+ Username +") is transfered from " + OldIPAddress + " to " + NewIPAddress);
+						return "Player account ("+ Username +") is transfered from " + OldIPAddress + " to " + NewIPAddress;
+					} else {
+						logger.info("IP : " + OldIPAddress + ", username : " + Username + ", Result transferAccount() : Player account is not transfered");
+						return "Player account is not transfered";
 					}
-					logger.info("IP : " + OldIPAddress + ", username : " + Username + ", Result transferAccount() : Invalid IP address or Password");
-					return "Invalid IP address or Password";
 				}
+				logger.info("IP : " + OldIPAddress + ", username : " + Username + ", Result transferAccount() : Invalid IP address or Password");
+				return "Invalid IP address or Password";
 			}
 		}
-		logger.info("IP : " + OldIPAddress + ", username : " + Username + ", Result transferAccount() : Player doesn't exists");
-		return "Player doesn't exists";
+		logger.info("IP : " + OldIPAddress + ", username : " + Username + ", Result transferAccount() : Player account ("+ Username +") doesn't exists");
+		return "Player account ("+ Username +") doesn't exists";
 	}
 	
 	/**
@@ -326,7 +324,7 @@ public class ASData {
 	 * @param fun type of method
 	 * @return
 	 */
-	public String transferAccountToOtherServer(String username, String password, String age, String ip, String firstName, String lastName, int port, String fun) {
+	synchronized public String transferAccountToOtherServer(String username, String password, String age, String ip, String firstName, String lastName, int port, String fun) {
 
 		DatagramSocket ds = null;
 		byte[] b = new byte[65535];
