@@ -3,6 +3,8 @@
 //https://www.geeksforgeeks.org/synchronized-in-java/
 package model;
 
+import java.util.Random;
+
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.ORBPackage.InvalidName;
 import org.omg.CosNaming.NamingContextExt;
@@ -72,17 +74,13 @@ public class Testing extends Thread {
 				+ "\n  will be successful otherwise only 1 out of 3 will be successful");
 		System.out.println("\n- We have made 3 threads that run on Asian server\n");
 		
-		Testing t1 = new Testing();
-		Testing t2 = new Testing();
-		Testing t3 = new Testing();
 		
-		t1.start();
-		t2.start();
-		t3.start();
+		for (int i=0; i<3; i++) {
+			Testing t1 = new Testing();
+			t1.start();
+		}
 		
-		t1.join();
-		t2.join();
-		t3.join();
+		Thread.sleep(1200);
 		
 		System.out.println("\n- testuserdata1 and testuserdata2 is either suspended or transfered depending on operation result,"
 				+ "\n however testuserdata3 is always created and offline. result of get player status after all thread execution as below\n");
@@ -151,6 +149,7 @@ public class Testing extends Thread {
 	public void run() {
 		
 		try {
+			Thread.sleep(new Random().nextInt(100));
 			System.out.println("Thread " + Thread.currentThread().getId() + " Method : createPlayerAccount() , " + " Username : testuserdata1 , " + createAdminObject("182.123.123.123").createPlayerAccount("testdata1", "userdata1", "24", "testuserdata1", "testuserdata1", "182.123.123.123"));
 			System.out.println("Thread " + Thread.currentThread().getId() + " Method : createPlayerAccount() , " + " Username : testuserdata2 , " + createAdminObject("182.123.123.123").createPlayerAccount("testdata2", "userdata2", "24", "testuserdata2", "testuserdata2", "182.123.123.123"));
 			System.out.println("Thread " + Thread.currentThread().getId() + " Method : createPlayerAccount() , " + " Username : testuserdata3 , " + createAdminObject("182.123.123.123").createPlayerAccount("testdata3", "userdata3", "24", "testuserdata3", "testuserdata3", "182.123.123.123"));

@@ -1,4 +1,5 @@
-Jun 21, 2020 6:05:12 PM client.PlayerClient addLog
+Jun 23, 2020 8:38:08 PM client.PlayerClient addLog
+INFO: Jun 21, 2020 6:05:12 PM client.PlayerClient addLog
 INFO: 
 Jun 21, 2020 6:05:12 PM client.PlayerClient signIn
 INFO: IP : 132.123.132.321, username : ypandya, start playerSignIn() operation.
@@ -28,3 +29,8 @@ Jun 21, 2020 6:08:49 PM client.PlayerClient signOut
 INFO: IP : 93.123.123.123, username : ypandya, start playerSignOut() operation.
 Jun 21, 2020 6:08:49 PM client.PlayerClient signOut
 INFO: IP : 93.123.123.123, username : ypandya, Result playerSignOut() : Player account (ypandya) doesn't exists
+
+Jun 23, 2020 8:38:08 PM client.PlayerClient createAccount
+INFO: IP : 132.123.123.123, username : ypandya, start createPlayerAccount() operation.
+Jun 23, 2020 8:38:08 PM client.PlayerClient createAccount
+INFO: IP : 132.123.123.123, username : ypandya, Result createPlayerAccount() : Player created successfully

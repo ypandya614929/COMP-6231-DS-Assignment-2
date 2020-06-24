@@ -9,11 +9,12 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+import java.util.concurrent.ConcurrentHashMap; 
+
 
 /**
  * @author ypandya
@@ -23,16 +24,16 @@ public class EUData {
 	/**
 	 * This is model class for Europe server
 	 */
-	HashMap<String, HashMap<String, Administrator>> adminserverData;
-	HashMap<String, HashMap<String, Player>> playerserverData;
+	ConcurrentHashMap<String, ConcurrentHashMap<String, Administrator>> adminserverData;
+	ConcurrentHashMap<String, ConcurrentHashMap<String, Player>> playerserverData;
 	String europIp;
 	private static Logger logger;
 
 	/**
 	 * This method is used to retrieve admin data from the server
-	 * @return HashMap containing admin server data
+	 * @return ConcurrentHashMap containing admin server data
 	 */
-	public HashMap<String, HashMap<String, Administrator>> getAdminserverData() {
+	public ConcurrentHashMap<String, ConcurrentHashMap<String, Administrator>> getAdminserverData() {
 		return adminserverData;
 	}
 
@@ -40,15 +41,15 @@ public class EUData {
 	 * This method is used to store player data on the server
 	 * @param serverData
 	 */
-	public void setPlayerserverData(HashMap<String, HashMap<String, Player>> serverData) {
+	public void setPlayerserverData(ConcurrentHashMap<String, ConcurrentHashMap<String, Player>> serverData) {
 		this.playerserverData = serverData;
 	}
 	
 	/**
 	 * This method is used to retrieve player data from the server
-	 * @return HashMap containing player server data
+	 * @return ConcurrentHashMap containing player server data
 	 */
-	public HashMap<String, HashMap<String, Player>> getPlayerserverData() {
+	public ConcurrentHashMap<String, ConcurrentHashMap<String, Player>> getPlayerserverData() {
 		return playerserverData;
 	}
 
@@ -56,7 +57,7 @@ public class EUData {
 	 * This method is used to store admin data on the server
 	 * @param serverData
 	 */
-	public void setAdminserverData(HashMap<String, HashMap<String, Administrator>> serverData) {
+	public void setAdminserverData(ConcurrentHashMap<String, ConcurrentHashMap<String, Administrator>> serverData) {
 		this.adminserverData = serverData;
 	}
 
@@ -80,8 +81,8 @@ public class EUData {
 	 * Constructor
 	 */
 	public EUData() {
-		adminserverData = new HashMap<>();
-		playerserverData = new HashMap<>();
+		adminserverData = new ConcurrentHashMap<>();
+		playerserverData = new ConcurrentHashMap<>();
 		addLog("logs/EU.txt", "EU");
 	}
 
@@ -99,7 +100,7 @@ public class EUData {
 		int onlineCount = 0;
 		int offlineCount = 0;
 		if (adminserverData.containsKey(key)) {
-			HashMap<String,Administrator> temp = adminserverData.get(key);
+			ConcurrentHashMap<String,Administrator> temp = adminserverData.get(key);
 			if (temp.containsKey(username)) {
 				adminObj = temp.get(username);
 			} else {
@@ -107,13 +108,13 @@ public class EUData {
 			}
 		} else {
 			adminObj = new Administrator(username, password, ip);
-			HashMap<String,Administrator> temp1 = new HashMap<>();
+			ConcurrentHashMap<String,Administrator> temp1 = new ConcurrentHashMap<>();
 			temp1.put(username, adminObj);
 			adminserverData.put(key, temp1);
 		}
 		adminObj.setPassword(password);
 		if (adminObj.userName.equals("Admin") && adminObj.password.equals("Admin")) {
-			for (Entry <String, HashMap<String, Player>> outerHashmap : playerserverData.entrySet()) {
+			for (Entry <String, ConcurrentHashMap<String, Player>> outerHashmap : playerserverData.entrySet()) {
 				for (Entry <String, Player> innerHashmap : outerHashmap.getValue().entrySet()) {
 					if (innerHashmap.getValue() != null) {
 						Player playerObj = innerHashmap.getValue();
@@ -145,7 +146,7 @@ public class EUData {
 		Administrator adminObj;
 		String key = Character.toString(AdminUsername.charAt(0));
 		if (adminserverData.containsKey(key)) {
-			HashMap<String,Administrator> temp = adminserverData.get(key);
+			ConcurrentHashMap<String,Administrator> temp = adminserverData.get(key);
 			if (temp.containsKey(AdminUsername)) {
 				adminObj = temp.get(AdminUsername);
 			} else {
@@ -153,7 +154,7 @@ public class EUData {
 			}
 		} else {
 			adminObj = new Administrator(AdminUsername, AdminPassword, AdminIP);
-			HashMap<String,Administrator> temp1 = new HashMap<>();
+			ConcurrentHashMap<String,Administrator> temp1 = new ConcurrentHashMap<>();
 			temp1.put(AdminUsername, adminObj);
 			adminserverData.put(key, temp1);
 		}
@@ -161,7 +162,7 @@ public class EUData {
 		String UsernameToSuspendKey = Character.toString(UsernameToSuspend.charAt(0));
 		if (adminObj.userName.equals("Admin") && adminObj.password.equals("Admin")) {
 			if (playerserverData.containsKey(UsernameToSuspendKey)) {
-				HashMap<String, Player> playerData = playerserverData.get(UsernameToSuspendKey);
+				ConcurrentHashMap<String, Player> playerData = playerserverData.get(UsernameToSuspendKey);
 				if (playerData.containsKey(UsernameToSuspend)) {
 					playerData.remove(UsernameToSuspend);
 					logger.info("IP : " + AdminIP + ", username : " + AdminUsername + ", Result suspendAccount() : Player account ("+ UsernameToSuspend +") is suspended");
@@ -190,7 +191,7 @@ public class EUData {
 		Player playerObj;
 		String key = Character.toString(userName.charAt(0));
 		if (playerserverData.containsKey(key)) {
-			HashMap<String,Player> temp = playerserverData.get(key);
+			ConcurrentHashMap<String,Player> temp = playerserverData.get(key);
 			if (temp.containsKey(userName)) {
 				playerObj = temp.get(userName);
 				logger.info("IP : " + ipAddress + ", username : " + userName + ", Result createPlayerAccount() : Player already exists");
@@ -203,7 +204,7 @@ public class EUData {
 			}
 		} else {
 			playerObj = new Player(firstName, lastName, age, userName, password, ipAddress);
-			HashMap<String,Player> temp1 = new HashMap<>();
+			ConcurrentHashMap<String,Player> temp1 = new ConcurrentHashMap<>();
 			temp1.put(userName, playerObj);
 			playerserverData.put(key, temp1);
 			logger.info("IP : " + ipAddress + ", username : " + userName + ", Result createPlayerAccount() : Player created successfully");
@@ -223,7 +224,7 @@ public class EUData {
 		Player playerObj;
 		String key = Character.toString(userName.charAt(0));
 		if (playerserverData.containsKey(key)) {
-			HashMap<String,Player> temp = playerserverData.get(key);
+			ConcurrentHashMap<String,Player> temp = playerserverData.get(key);
 			if (temp.containsKey(userName)) {
 				playerObj = temp.get(userName);
 				if (playerObj.userName.equals(userName) && playerObj.password.equals(password) && playerObj.ipAddress.equals(ipAddress)) {
@@ -257,7 +258,7 @@ public class EUData {
 		Player playerObj;
 		String key = Character.toString(userName.charAt(0));
 		if (playerserverData.containsKey(key)) {
-			HashMap<String,Player> temp = playerserverData.get(key);
+			ConcurrentHashMap<String,Player> temp = playerserverData.get(key);
 			if (temp.containsKey(userName)) {
 				playerObj = temp.get(userName);
 				if (playerObj.userName.equals(userName) && playerObj.ipAddress.equals(ipAddress)) {
@@ -291,7 +292,7 @@ public class EUData {
 		Player playerObj;
 		String key = Character.toString(Username.charAt(0));
 		if (playerserverData.containsKey(key)) {
-			HashMap<String,Player> playerData = playerserverData.get(key);
+			ConcurrentHashMap<String,Player> playerData = playerserverData.get(key);
 			if (playerData.containsKey(Username)) {
 				playerObj = playerData.get(Username);
 				if (playerObj.userName.equals(Username) && playerObj.ipAddress.equals(OldIPAddress) && playerObj.password.equals(Password)) {
