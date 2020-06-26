@@ -72,9 +72,9 @@ public class GameServer {
             
             System.out.println("Server(s) are Started");
     		
-//    		loadData(europe, northamerica, asia);
+    		loadData(europe, northamerica, asia);
     		
-//    		System.out.println("Initial data loaded into server");
+    		System.out.println("Initial data loaded into server");
     		
             // client's invocations
     		for (;;) { orb.run(); }

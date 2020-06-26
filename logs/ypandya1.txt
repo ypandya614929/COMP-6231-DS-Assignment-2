@@ -1,0 +1,6 @@
+Jun 26, 2020 6:30:40 PM client.PlayerClient addLog
+INFO: 
+Jun 26, 2020 6:30:40 PM client.PlayerClient signOut
+INFO: IP : 132.123.321.123, username : ypandya1, start playerSignOut() operation.
+Jun 26, 2020 6:30:40 PM client.PlayerClient signOut
+INFO: IP : 132.123.321.123, username : ypandya1, Result playerSignOut() : Player account (ypandya1) doesn't exists

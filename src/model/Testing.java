@@ -63,7 +63,7 @@ public class Testing extends Thread {
 		System.out.println("\n--------------------------- Advanced Test Cases ---------------------------\n");
 		System.out.println("Test case detail");
 		System.out.println("----------------");
-		System.out.println("- We have made 3 threads that run on Asian server and transfer operations are performed on Europe server");
+		System.out.println("- I have made 3 threads that run on Asian server and transfer operations are performed on Europe server");
 		System.out.println("\n- Each threads try to create 3 different players with username testuserdata1, testuserdata2 and testuserdata3");
 		System.out.println("\n- Out of 9 thread calls only 3 will be successful and rest of them contains an error");
 		System.out.println("\n- Each threads try to suspend testuserdata1 player account only 1 out of 3 will be successful");
@@ -72,7 +72,7 @@ public class Testing extends Thread {
 		System.out.println("\n- Each threads try to transfer testuserdata2 player account only 1 out of 3 will be successful");
 		System.out.println("\n- Each threads try to suspend testuserdata2 player account if its already transfered than none of thread "
 				+ "\n  will be successful otherwise only 1 out of 3 will be successful");
-		System.out.println("\n- We have made 3 threads that run on Asian server\n");
+		System.out.println("\n- I have made 3 threads that run on Asian server\n");
 		
 		
 		for (int i=0; i<3; i++) {
@@ -149,7 +149,6 @@ public class Testing extends Thread {
 	public void run() {
 		
 		try {
-			Thread.sleep(new Random().nextInt(100));
 			System.out.println("Thread " + Thread.currentThread().getId() + " Method : createPlayerAccount() , " + " Username : testuserdata1 , " + createAdminObject("182.123.123.123").createPlayerAccount("testdata1", "userdata1", "24", "testuserdata1", "testuserdata1", "182.123.123.123"));
 			System.out.println("Thread " + Thread.currentThread().getId() + " Method : createPlayerAccount() , " + " Username : testuserdata2 , " + createAdminObject("182.123.123.123").createPlayerAccount("testdata2", "userdata2", "24", "testuserdata2", "testuserdata2", "182.123.123.123"));
 			System.out.println("Thread " + Thread.currentThread().getId() + " Method : createPlayerAccount() , " + " Username : testuserdata3 , " + createAdminObject("182.123.123.123").createPlayerAccount("testdata3", "userdata3", "24", "testuserdata3", "testuserdata3", "182.123.123.123"));
